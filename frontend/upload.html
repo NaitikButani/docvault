@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upload Document — DocVault</title>
+  <meta name="description" content="Upload documents to DocVault for AI-powered text extraction, summarization, and tagging." />
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <a href="/dashboard" class="nav-logo">
+    <span class="icon">🗄️</span>
+    <span class="gradient-text">DocVault</span>
+  </a>
+  <div class="nav-links">
+    <a href="/dashboard" class="nav-link">📁 Dashboard</a>
+    <a href="/upload" class="nav-link active">⬆️ Upload</a>
+    <a href="/search-page" class="nav-link">🔍 Search</a>
+  </div>
+  <div class="nav-user">
+    <span id="nav-username" style="font-size:0.85rem;color:var(--text-secondary)">Loading...</span>
+    <div class="nav-avatar" id="nav-avatar" title="Profile">?</div>
+    <button class="btn btn-secondary btn-sm" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<main class="main-container" style="max-width:760px;">
+  <div class="page-header">
+    <h1 class="page-title">Upload Document</h1>
+    <p class="page-subtitle">AI will automatically extract text, generate a summary, and tag your document</p>
+  </div>
+
+  <!-- Upload Zone -->
+  <div class="card" style="padding:2rem;margin-bottom:1.5rem;">
+    <div
+      class="upload-zone"
+      id="upload-zone"
+      onclick="document.getElementById('file-input').click()"
+      ondragover="onDragOver(event)"
+      ondragleave="onDragLeave(event)"
+      ondrop="onDrop(event)"
+    >
+      <div class="upload-icon">📤</div>
+      <div class="upload-title">Drop your file here or click to browse</div>
+      <div class="upload-sub">Supports PDF, DOCX, TXT, PNG, JPG, TIFF and more</div>
+      <div class="upload-formats">
+        <span class="badge badge-pdf">PDF</span>
+        <span class="badge badge-docx">DOCX</span>
+        <span class="badge badge-txt">TXT</span>
+        <span class="badge badge-image">PNG</span>
+        <span class="badge badge-image">JPG</span>
+        <span class="badge badge-image">TIFF</span>
+      </div>
+      <input type="file" id="file-input" style="display:none;" accept=".pdf,.docx,.doc,.txt,.png,.jpg,.jpeg,.bmp,.tiff,.tif,.webp" onchange="onFileSelect(this)" />
+    </div>
+
+    <!-- Selected File Preview -->
+    <div id="file-preview" style="display:none;margin-top:1.25rem;">
+      <div style="display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--border-radius-sm);">
+        <span id="file-preview-icon" style="font-size:2rem;">📄</span>
+        <div style="flex:1;">
+          <div id="file-preview-name" style="font-weight:600;font-size:0.95rem;"></div>
+          <div id="file-preview-size" style="font-size:0.8rem;color:var(--text-muted);margin-top:0.15rem;"></div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="clearFile()">✕ Remove</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Document Options -->
+  <div class="card" style="padding:1.5rem;margin-bottom:1.5rem;" id="upload-options">
+    <h3 style="font-size:1rem;font-weight:700;margin-bottom:1rem;">Document Options</h3>
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+      <div class="input-group">
+        <label class="input-label">Custom Title (optional)</label>
+        <input type="text" class="input-field" id="doc-title" placeholder="Leave empty to use filename" />
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Processing Info -->
+  <div class="card" style="padding:1.5rem;margin-bottom:1.5rem;background:var(--gradient-card);">
+    <h3 style="font-size:0.95rem;font-weight:700;margin-bottom:1rem;color:var(--accent-blue);">🤖 What AI Does on Upload</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+      <div style="display:flex;gap:0.5rem;align-items:flex-start;">
+        <span>📝</span>
+        <div>
+          <div style="font-size:0.85rem;font-weight:600;">Text Extraction</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);">Extracts all text from your document</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:0.5rem;align-items:flex-start;">
+        <span>🔍</span>
+        <div>
+          <div style="font-size:0.85rem;font-weight:600;">Semantic Embedding</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);">Creates AI vector for smart search</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:0.5rem;align-items:flex-start;">
+        <span>📋</span>
+        <div>
+          <div style="font-size:0.85rem;font-weight:600;">Auto-Summary</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);">Generates a concise document summary</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:0.5rem;align-items:flex-start;">
+        <span>🏷️</span>
+        <div>
+          <div style="font-size:0.85rem;font-weight:600;">Auto-Tagging</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);">Extracts top keywords as tags</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload Button -->
+  <button class="btn btn-primary btn-lg" id="upload-btn" onclick="uploadDocument()" style="width:100%;justify-content:center;" disabled>
+    ⬆️ Upload & Process Document
+  </button>
+
+  <!-- Upload Progress -->
+  <div class="upload-progress" id="upload-progress">
+    <div class="upload-progress-info">
+      <span id="progress-label">Uploading...</span>
+      <span id="progress-pct">0%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+    <div class="upload-steps">
+      <div class="upload-step" id="step-upload">📤 Uploading</div>
+      <div class="upload-step" id="step-extract">📝 Extracting Text</div>
+      <div class="upload-step" id="step-embed">🔍 Embedding</div>
+      <div class="upload-step" id="step-tag">🏷️ Tagging</div>
+      <div class="upload-step" id="step-done">✅ Done</div>
+    </div>
+  </div>
+
+  <!-- Result Card -->
+  <div id="upload-result" style="display:none;margin-top:1.5rem;">
+    <div class="card" style="padding:1.5rem;">
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;">
+        <span style="font-size:1.5rem;">✅</span>
+        <h3 style="font-size:1.1rem;font-weight:700;">Document Processed!</h3>
+      </div>
+      <div id="result-details"></div>
+      <div style="display:flex;gap:0.75rem;margin-top:1.25rem;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="window.location.href='/dashboard'">📁 Go to Dashboard</button>
+        <button class="btn btn-secondary" onclick="uploadAnother()">⬆️ Upload Another</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script src="/static/js/auth.js"></script>
+<script src="/static/js/upload.js"></script>
+</body>
+</html>

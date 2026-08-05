@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — DocVault</title>
+  <meta name="description" content="Manage and search your documents with AI-powered DocVault." />
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <a href="/dashboard" class="nav-logo">
+    <span class="icon">🗄️</span>
+    <span class="gradient-text">DocVault</span>
+  </a>
+  <div class="nav-links">
+    <a href="/dashboard" class="nav-link active" id="nav-dashboard">📁 Dashboard</a>
+    <a href="/upload" class="nav-link" id="nav-upload">⬆️ Upload</a>
+    <a href="/search-page" class="nav-link" id="nav-search">🔍 Search</a>
+  </div>
+  <div class="nav-user">
+    <span id="nav-username" style="font-size:0.85rem;color:var(--text-secondary)">Loading...</span>
+    <div class="nav-avatar" id="nav-avatar" title="Profile">?</div>
+    <button class="btn btn-secondary btn-sm" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<!-- Main Layout -->
+<div class="layout-with-sidebar">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-section-title">Documents</div>
+    <a href="#" class="sidebar-link active" onclick="filterDocs('all')" id="filter-all">
+      📂 All Documents <span class="count" id="count-all">0</span>
+    </a>
+    <a href="#" class="sidebar-link" onclick="filterDocs('mine')" id="filter-mine">
+      👤 My Documents <span class="count" id="count-mine">0</span>
+    </a>
+    <a href="#" class="sidebar-link" onclick="filterDocs('shared')" id="filter-shared">
+      🔗 Shared with Me <span class="count" id="count-shared">0</span>
+    </a>
+    <a href="#" class="sidebar-link" onclick="filterDocs('public')" id="filter-public">
+      🌐 Public Docs <span class="count" id="count-public">0</span>
+    </a>
+
+    <div class="sidebar-section-title">File Types</div>
+    <a href="#" class="sidebar-link" onclick="filterType('pdf')">📕 PDF</a>
+    <a href="#" class="sidebar-link" onclick="filterType('docx')">📘 Word</a>
+    <a href="#" class="sidebar-link" onclick="filterType('txt')">📃 Text</a>
+    <a href="#" class="sidebar-link" onclick="filterType('image')">🖼️ Images</a>
+
+    <div class="sidebar-section-title">Quick Actions</div>
+    <a href="/upload" class="sidebar-link">⬆️ Upload Document</a>
+    <a href="/search-page" class="sidebar-link">🔍 Semantic Search</a>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-container">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
+      <div>
+        <h1 class="page-title">My Documents</h1>
+        <p class="page-subtitle">Manage, search and share your AI-powered document vault</p>
+      </div>
+      <a href="/upload" class="btn btn-primary">⬆️ Upload New</a>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row" id="stats-row">
+      <div class="card stat-card">
+        <div class="stat-icon">📁</div>
+        <div class="stat-value" id="stat-total">0</div>
+        <div class="stat-label">Total Documents</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-icon">📄</div>
+        <div class="stat-value" id="stat-pdf">0</div>
+        <div class="stat-label">PDFs</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-icon">🔗</div>
+        <div class="stat-value" id="stat-shared">0</div>
+        <div class="stat-label">Shared</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-icon">🤖</div>
+        <div class="stat-value" id="stat-tagged">0</div>
+        <div class="stat-label">AI-Tagged</div>
+      </div>
+    </div>
+
+    <!-- Search quick bar -->
+    <div class="search-container">
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          class="search-input"
+          id="quick-search"
+          placeholder="Quick filter by title or tag..."
+          oninput="quickFilter(this.value)"
+        />
+      </div>
+    </div>
+
+    <!-- Filter chips -->
+    <div class="filter-row" id="filter-row"></div>
+
+    <!-- Documents Grid -->
+    <div id="doc-grid" class="doc-grid">
+      <div class="empty-state">
+        <div class="big-spinner"></div>
+        <p style="margin-top:1rem;color:var(--text-muted)">Loading documents...</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Document Detail Modal -->
+<div class="modal-overlay" id="doc-modal">
+  <div class="modal" style="max-width:620px;">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modal-title">Document Details</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- Share Modal -->
+<div class="modal-overlay" id="share-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Share Document</h2>
+      <button class="modal-close" onclick="closeShareModal()">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+      <div class="input-group">
+        <label class="input-label">Share with username</label>
+        <input type="text" class="input-field" id="share-username" placeholder="Enter username" />
+      </div>
+      <div class="input-group">
+        <label class="input-label">Permission</label>
+        <select class="input-field" id="share-permission">
+          <option value="view">View only</option>
+          <option value="edit">Edit access</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="confirmShare()">🔗 Share Document</button>
+      <hr class="divider" />
+      <div id="current-shares"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="big-spinner"></div>
+  <span id="loading-text">Processing...</span>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script src="/static/js/auth.js"></script>
+<script src="/static/js/dashboard.js"></script>
+</body>
+</html>

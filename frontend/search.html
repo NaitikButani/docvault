@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Semantic Search — DocVault</title>
+  <meta name="description" content="Search your documents by meaning using AI-powered semantic search." />
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <style>
+    .search-hero {
+      background: var(--gradient-card);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--border-radius-lg);
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    .search-hero h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .search-hero p { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1.5rem; }
+    .big-search {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      background: var(--bg-secondary);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--border-radius);
+      padding: 0.5rem 0.5rem 0.5rem 1.25rem;
+      transition: var(--transition);
+    }
+    .big-search:focus-within {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.15);
+    }
+    .big-search input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      font-size: 1.1rem;
+      color: var(--text-primary);
+      padding: 0.5rem 0;
+    }
+    .big-search input::placeholder { color: var(--text-muted); }
+
+    .search-suggestions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+    .suggestion-chip {
+      padding: 0.3rem 0.85rem;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .suggestion-chip:hover {
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+      background: rgba(79,142,247,0.08);
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .results-count { font-size: 0.9rem; color: var(--text-secondary); }
+    .mode-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.3rem 0.85rem;
+      border-radius: 100px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .mode-indicator.semantic { background: rgba(155,89,244,0.1); color: #c084fc; border: 1px solid rgba(155,89,244,0.2); }
+    .mode-indicator.keyword { background: rgba(79,142,247,0.1); color: #60a5fa; border: 1px solid rgba(79,142,247,0.2); }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <a href="/dashboard" class="nav-logo">
+    <span class="icon">🗄️</span>
+    <span class="gradient-text">DocVault</span>
+  </a>
+  <div class="nav-links">
+    <a href="/dashboard" class="nav-link">📁 Dashboard</a>
+    <a href="/upload" class="nav-link">⬆️ Upload</a>
+    <a href="/search-page" class="nav-link active">🔍 Search</a>
+  </div>
+  <div class="nav-user">
+    <span id="nav-username" style="font-size:0.85rem;color:var(--text-secondary)">Loading...</span>
+    <div class="nav-avatar" id="nav-avatar" title="Profile">?</div>
+    <button class="btn btn-secondary btn-sm" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<main class="main-container">
+  <!-- Search Hero -->
+  <div class="search-hero">
+    <h2>🔍 AI Semantic Search</h2>
+    <p>Search by meaning, not just keywords. Our AI understands the intent behind your query.</p>
+
+    <div class="big-search">
+      <span style="font-size:1.3rem;">🔍</span>
+      <input
+        type="text"
+        id="search-input"
+        placeholder="Describe what you're looking for..."
+        onkeydown="if(event.key==='Enter') performSearch()"
+        autofocus
+      />
+      <div class="search-mode-toggle">
+        <button class="mode-btn active" id="mode-semantic" onclick="setMode('semantic')">🤖 Semantic</button>
+        <button class="mode-btn" id="mode-keyword" onclick="setMode('keyword')">🔤 Keyword</button>
+      </div>
+      <button class="btn btn-primary" onclick="performSearch()">Search</button>
+    </div>
+
+    <div class="search-suggestions" id="suggestions">
+      <span class="suggestion-chip" onclick="useSuggestion('machine learning techniques')">machine learning techniques</span>
+      <span class="suggestion-chip" onclick="useSuggestion('financial report analysis')">financial report analysis</span>
+      <span class="suggestion-chip" onclick="useSuggestion('project requirements')">project requirements</span>
+      <span class="suggestion-chip" onclick="useSuggestion('meeting notes')">meeting notes</span>
+      <span class="suggestion-chip" onclick="useSuggestion('research paper summary')">research paper summary</span>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="results-section" style="display:none;">
+    <div class="results-header">
+      <div class="results-count" id="results-count">Searching...</div>
+      <div class="mode-indicator" id="mode-badge"></div>
+    </div>
+    <div id="results-list"></div>
+  </div>
+
+  <!-- Initial State -->
+  <div id="initial-state">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-top:1rem;">
+      <div class="card" style="padding:1.5rem;">
+        <div style="font-size:2rem;margin-bottom:0.75rem;">🧠</div>
+        <h3 style="font-size:0.95rem;font-weight:700;margin-bottom:0.35rem;">Semantic Mode</h3>
+        <p style="font-size:0.82rem;color:var(--text-secondary);">Uses AI embeddings (sentence-transformers) to understand meaning. Finds conceptually similar documents even without exact keyword matches.</p>
+      </div>
+      <div class="card" style="padding:1.5rem;">
+        <div style="font-size:2rem;margin-bottom:0.75rem;">🔤</div>
+        <h3 style="font-size:0.95rem;font-weight:700;margin-bottom:0.35rem;">Keyword Mode</h3>
+        <p style="font-size:0.82rem;color:var(--text-secondary);">Traditional text search. Finds documents containing your exact search terms in the title, body text, or tags.</p>
+      </div>
+      <div class="card" style="padding:1.5rem;">
+        <div style="font-size:2rem;margin-bottom:0.75rem;">📊</div>
+        <h3 style="font-size:0.95rem;font-weight:700;margin-bottom:0.35rem;">Relevance Scoring</h3>
+        <p style="font-size:0.82rem;color:var(--text-secondary);">Results are ranked by cosine similarity score (semantic) or keyword frequency (keyword mode) for the most relevant results first.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Document Detail Modal -->
+<div class="modal-overlay" id="doc-modal">
+  <div class="modal" style="max-width:620px;">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modal-title">Document Details</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script src="/static/js/auth.js"></script>
+<script src="/static/js/search.js"></script>
+</body>
+</html>

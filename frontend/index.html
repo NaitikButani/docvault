@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DocVault — AI Document Management</title>
+  <meta name="description" content="DocVault: AI-powered document management with semantic search, OCR, auto-tagging, and smart summarization." />
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <style>
+    .hero-section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-bg-orbs {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.15;
+      animation: float 8s ease-in-out infinite;
+    }
+    .orb-1 { width: 500px; height: 500px; background: #4f8ef7; top: -150px; left: -150px; animation-delay: 0s; }
+    .orb-2 { width: 400px; height: 400px; background: #9b59f4; bottom: -100px; right: -100px; animation-delay: 3s; }
+    .orb-3 { width: 300px; height: 300px; background: #00d2ff; top: 50%; left: 60%; animation-delay: 5s; }
+    @keyframes float {
+      0%,100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-30px) scale(1.05); }
+    }
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      max-width: 1000px;
+      width: 100%;
+      align-items: center;
+    }
+    @media (max-width: 768px) {
+      .hero-content { grid-template-columns: 1fr; gap: 2rem; }
+      .hero-right { order: -1; }
+    }
+    .hero-left { }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      background: rgba(79,142,247,0.1);
+      border: 1px solid rgba(79,142,247,0.25);
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent-blue);
+      margin-bottom: 1.5rem;
+    }
+    .hero-title {
+      font-size: 3.2rem;
+      font-weight: 900;
+      letter-spacing: -2px;
+      line-height: 1.1;
+      margin-bottom: 1.25rem;
+    }
+    .hero-title .line2 {
+      background: var(--gradient-main);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-desc {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .feature-pills {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 2rem;
+    }
+    .feature-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem 1rem;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--border-radius-sm);
+      font-size: 0.85rem;
+    }
+    .pill-icon { font-size: 1.1rem; }
+    .pill-text strong { display: block; font-weight: 600; }
+    .pill-text span { color: var(--text-muted); font-size: 0.78rem; }
+
+    /* Auth card on right */
+    .hero-right .auth-card { max-width: 100%; }
+  </style>
+</head>
+<body>
+
+<section class="hero-section">
+  <div class="hero-bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <div class="hero-content">
+    <!-- Left: Info -->
+    <div class="hero-left">
+      <div class="hero-badge">
+        <span>✨</span> AI-Powered Document Intelligence
+      </div>
+      <h1 class="hero-title">
+        Manage Docs<br>
+        <span class="line2">Semantically.</span>
+      </h1>
+      <p class="hero-desc">
+        Upload PDFs, Word files, images — DocVault extracts text, generates summaries, 
+        auto-tags, and lets you search by <em>meaning</em>, not just keywords.
+      </p>
+
+      <div class="feature-pills">
+        <div class="feature-pill">
+          <span class="pill-icon">🔍</span>
+          <div class="pill-text">
+            <strong>Semantic Search</strong>
+            <span>Find docs by meaning using AI embeddings</span>
+          </div>
+        </div>
+        <div class="feature-pill">
+          <span class="pill-icon">📄</span>
+          <div class="pill-text">
+            <strong>OCR + Extraction</strong>
+            <span>PDF, DOCX, TXT, scanned images</span>
+          </div>
+        </div>
+        <div class="feature-pill">
+          <span class="pill-icon">🤖</span>
+          <div class="pill-text">
+            <strong>Auto-Summarize & Tag</strong>
+            <span>Instant AI summaries and keyword tags</span>
+          </div>
+        </div>
+        <div class="feature-pill">
+          <span class="pill-icon">🔗</span>
+          <div class="pill-text">
+            <strong>Sharing & Permissions</strong>
+            <span>Share docs with view or edit access</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Auth Card -->
+    <div class="hero-right">
+      <div class="card auth-card">
+        <div class="auth-logo">
+          <span class="logo-icon">🗄️</span>
+          <h1>DocVault</h1>
+          <p>Your intelligent document vault</p>
+        </div>
+
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+          <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Register</button>
+        </div>
+
+        <!-- Login Form -->
+        <form class="auth-form" id="login-form" onsubmit="handleLogin(event)">
+          <div class="input-group">
+            <label class="input-label">Username</label>
+            <input type="text" class="input-field" id="login-username" placeholder="Enter your username" required />
+          </div>
+          <div class="input-group">
+            <label class="input-label">Password</label>
+            <input type="password" class="input-field" id="login-password" placeholder="Enter your password" required />
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg" id="login-btn" style="width:100%;justify-content:center;">
+            Sign In →
+          </button>
+        </form>
+
+        <!-- Register Form -->
+        <form class="auth-form" id="register-form" style="display:none;" onsubmit="handleRegister(event)">
+          <div class="input-group">
+            <label class="input-label">Full Name</label>
+            <input type="text" class="input-field" id="reg-name" placeholder="John Doe" />
+          </div>
+          <div class="input-group">
+            <label class="input-label">Username</label>
+            <input type="text" class="input-field" id="reg-username" placeholder="johndoe" required />
+          </div>
+          <div class="input-group">
+            <label class="input-label">Email</label>
+            <input type="email" class="input-field" id="reg-email" placeholder="john@example.com" required />
+          </div>
+          <div class="input-group">
+            <label class="input-label">Password</label>
+            <input type="password" class="input-field" id="reg-password" placeholder="Min. 6 characters" required minlength="6" />
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg" id="reg-btn" style="width:100%;justify-content:center;">
+            Create Account →
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script src="/static/js/auth.js"></script>
+</body>
+</html>

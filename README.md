@@ -1,4 +1,4 @@
-# 🗄️ DocVault — AI-Powered Document Management
+# DocVault — AI-Powered Document Management
 
 > **Document Management + Semantic Search** — a full-stack Python web application for your resume.
 

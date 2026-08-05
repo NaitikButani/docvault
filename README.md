@@ -1,13 +1,7 @@
 # DocVault — AI-Powered Document Management
 
-> **Document Management + Semantic Search** — a full-stack Python web application for your resume.
-
-![Stack](https://img.shields.io/badge/Backend-FastAPI-009688?style=flat-square)
-![Stack](https://img.shields.io/badge/AI-sentence--transformers-purple?style=flat-square)
-![Stack](https://img.shields.io/badge/DB-SQLite-blue?style=flat-square)
-![Stack](https://img.shields.io/badge/Frontend-Vanilla%20JS-yellow?style=flat-square)
-
 ---
+
 
 ## ✨ Features
 
